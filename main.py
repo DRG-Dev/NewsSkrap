@@ -58,7 +58,7 @@ class Interface(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     mywin = Interface()
-    myR = InterfaceR
+    myR = InterfaceR()
     myR.show()
     mywin.show()
     sys.exit(app.exec_())
