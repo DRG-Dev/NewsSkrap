@@ -118,23 +118,29 @@ border-radius: 20px;</string>
      <string>Log In</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>380</y>
-      <width>171</width>
-      <height>20</height>
+      <x>190</x>
+      <y>530</y>
+      <width>221</width>
+      <height>51</height>
      </rect>
     </property>
-    <property name="layoutDirection">
-     <enum>Qt::LeftToRight</enum>
+    <property name="font">
+     <font>
+      <pointsize>13</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">color: rgb(161, 217, 247);</string>
+     <string notr="true">background-color: rgb(128, 172, 196);
+color: rgb(42, 93, 120);
+border-radius: 20px;</string>
     </property>
     <property name="text">
-     <string>register or change password</string>
+     <string>Sign up</string>
     </property>
    </widget>
   </widget>
