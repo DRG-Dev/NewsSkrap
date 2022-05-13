@@ -1,16 +1,50 @@
-import sys
+import sys, re, urllib, html2text
+from urllib import request
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Check_db import *
 from LoginP import *
-from RegW import *
+#from RegW import *
+from ParseFormP import *
 
 class InterfaceR(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(InterfaceR,self).__init__(parent)
         self.ui = Ui_Form()
         self.ui.setupUi(self)
+        self.newsURL=[]
+        self.parser()
 
-        #self.ui.pushButton.clicked.connect(self.auth)
+
+        self.ui.pushButton.clicked.connect(self.OpenNews)
+
+    def parser(self):
+        s = 'https://russian.rt.com/news'
+        doc = urllib.request.urlopen(s).read().decode('utf-8', errors='ignore')
+        doc = doc.replace('\n' , '')
+        zagolovki = re.findall('<a class="link link_color" href="(.+?)</a>', doc)
+        for x in zagolovki:
+            self.newsURL.append(x.split('">')[0])
+            self.ui.listWidget.addItem(x.split('">')[1].strip())
+
+
+    def OpenNews(self):
+        n= self.ui.listWidget.currentRow()
+        u = 'https://russian.rt.com'+self.newsURL[n]
+        doc = urllib.request.urlopen(u).read().decode('utf-8', errors='ignore')
+        h = html2text.HTML2Text()
+        h.ignore_links= True
+        h.body_width= False
+        h.ignore_images= True
+        doc = h.handle(doc)
+        mas = doc.split('\n')
+        newstext = ''
+        for x in mas:
+            if(len(x)>110):
+                newstext = newstext+x+'\n\n'
+                self.ui.textEdit.setText(newstext)
+
+
+
 
 class Interface(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
