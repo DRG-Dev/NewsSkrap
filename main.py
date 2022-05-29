@@ -1,7 +1,8 @@
 import sys
 import json
-from PyQt5.QtGui import QTextCursor,QImage
+from PyQt5.QtGui import QTextCursor, QImage
 from PyQt5.QtWidgets import QDesktopWidget
+from PyQt5 import QtCore
 from Check_db import *
 from LoginP import *
 from ParseFormPN import *
@@ -76,6 +77,7 @@ class InterfaceR(QtWidgets.QWidget):
 
 
     def OpenNews(self):
+        self.ui.textEdit.clear()
         n = self.ui.listWidget.currentRow()
         jsonConnect = open("data/news.json")
         data = json.load(jsonConnect)
@@ -90,12 +92,13 @@ class InterfaceR(QtWidgets.QWidget):
 
         image = QImage()
         image.loadFromData(requests.get(imgSrc).content)
-        image = image.scaledToWidth(myR.width() - 100)
+        image = image.scaledToWidth(myR.width() - 50)
         document = self.ui.textEdit.document()
         cursor = QTextCursor(document)
+
         cursor.insertImage(image)
         cursor.insertText("\n\n" + finalLayout)
-        cursor.insertText(dateInfo)
+        cursor.insertText("\n\n" + dateInfo)
 
 
 
