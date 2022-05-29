@@ -2,7 +2,7 @@ import sys
 import json
 from PyQt5.QtGui import QTextCursor, QImage
 from PyQt5.QtWidgets import QDesktopWidget
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 from Check_db import *
 from LoginP import *
 from ParseFormPN import *
@@ -92,7 +92,8 @@ class InterfaceR(QtWidgets.QWidget):
 
         image = QImage()
         image.loadFromData(requests.get(imgSrc).content)
-        image = image.scaledToWidth(myR.width() - 50)
+        image = image.scaledToWidth(myR.width() - 60)
+
         document = self.ui.textEdit.document()
         cursor = QTextCursor(document)
 
@@ -152,9 +153,11 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     mywin = Interface()
     mywin.setWindowTitle('NewsScrap')
+    mywin.setWindowIcon(QtGui.QIcon('1.png'))
     mywin.setFixedSize(600, 700)
     myR = InterfaceR()
     myR.setWindowTitle('NewsScrap')
+    myR.setWindowIcon(QtGui.QIcon('1.png'))
     myR.setFixedSize(1000, 950)
     myR.center()
     mywin.show()

@@ -1,0 +1,26 @@
+{
+    "0": {
+        "category_Name": "Политика",
+        "category_Link": "/politics/"
+    },
+    "1": {
+        "category_Name": "В мире",
+        "category_Link": "/world/"
+    },
+    "2": {
+        "category_Name": "Экономика",
+        "category_Link": "/economy/"
+    },
+    "3": {
+        "category_Name": "Общество",
+        "category_Link": "/society/"
+    },
+    "4": {
+        "category_Name": "Происшествия",
+        "category_Link": "/incidents/"
+    },
+    "5": {
+        "category_Name": "Армия",
+        "category_Link": "/defense_safety/"
+    }
+}
