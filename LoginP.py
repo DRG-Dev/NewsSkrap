@@ -15,6 +15,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(600, 700)
+        MainWindow.setWindowTitle('NewsScrap')
         MainWindow.setStyleSheet("background-color: rgb(42, 93, 120);")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")

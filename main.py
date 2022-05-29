@@ -1,9 +1,10 @@
 import sys, re, urllib, html2text
 from urllib import request
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QTextCursor,QImage
+import requests
 from Check_db import *
 from LoginP import *
-#from RegW import *
 from ParseFormP import *
 
 class InterfaceR(QtWidgets.QWidget):
@@ -20,11 +21,11 @@ class InterfaceR(QtWidgets.QWidget):
     def parser(self):
         s = 'https://russian.rt.com/news'
         doc = urllib.request.urlopen(s).read().decode('utf-8', errors='ignore')
-        doc = doc.replace('\n' , '')
+        doc = doc.replace('\n', '')
         zagolovki = re.findall('<a class="link link_color" href="(.+?)</a>', doc)
         for x in zagolovki:
             self.newsURL.append(x.split('">')[0])
-            self.ui.listWidget.addItem(x.split('">')[1].strip())
+            self.ui.listWidget.addItem(x.split('">')[1].strip() + "\n")
 
 
     def OpenNews(self):
@@ -38,10 +39,18 @@ class InterfaceR(QtWidgets.QWidget):
         doc = h.handle(doc)
         mas = doc.split('\n')
         newstext = ''
+        imgsrc = "https://cdni.rt.com/russian/images/2022.05/article/6291c0f5ae5ac933e1109912.jpg"
+        image = QImage()
+        image.loadFromData(requests.get(imgsrc).content)
+        image = image.scaledToWidth(myR.width() - 100)
+        document = self.ui.textEdit.document()
+        cursor = QTextCursor(document)
+
         for x in mas:
-            if(len(x)>110):
+            if(len(x)>90):
                 newstext = newstext+x+'\n\n'
                 self.ui.textEdit.setText(newstext)
+                cursor.insertImage(image)
 
 
 
@@ -105,6 +114,11 @@ class Interface(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     mywin = Interface()
+    mywin.setWindowTitle('NewsSkrap')
+    mywin.setFixedSize(600,700)
     myR = InterfaceR()
+    myR.setWindowTitle('NewsSkrap')
+    myR.setFixedSize(800,900)
+    myR.ui.textEdit.toHtml()
     mywin.show()
     sys.exit(app.exec_())

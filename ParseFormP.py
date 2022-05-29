@@ -17,14 +17,19 @@ class Ui_Form(object):
         Form.resize(800, 900)
         Form.setStyleSheet("background-color: rgb(42, 93, 120);")
         self.listWidget = QtWidgets.QListWidget(Form)
-        self.listWidget.setGeometry(QtCore.QRect(0, 0, 801, 331))
+        self.listWidget.setGeometry(QtCore.QRect(0, 0, 800, 330))
         self.listWidget.setStyleSheet("color: rgba(161, 217, 247,97);\n"
-"border-radius: 20px;")
+"border-radius: 10px;\n"
+"border: 2px solid black;\n"
+"padding: 0 0 0 10px")
         self.listWidget.setObjectName("listWidget")
+        self.listWidget.setWordWrap(True)
         self.textEdit = QtWidgets.QTextEdit(Form)
         self.textEdit.setGeometry(QtCore.QRect(0, 350, 811, 471))
+        self.textEdit.toPlainText().encode("utf-8")
         self.textEdit.setStyleSheet("color: rgba(161, 217, 247,97);\n"
-"border-radius: 20px;")
+"border-radius: 10px;\n"
+"border: 2px solid black")
         self.textEdit.setObjectName("textEdit")
         self.pushButton = QtWidgets.QPushButton(Form)
         self.pushButton.setGeometry(QtCore.QRect(160, 840, 491, 51))
@@ -32,6 +37,10 @@ class Ui_Form(object):
         font.setPointSize(13)
         font.setBold(True)
         font.setWeight(75)
+        font_textedit = QtGui.QFont()
+        font_textedit.setPointSize(11)
+        self.listWidget.setFont(font)
+        self.textEdit.setFont(font_textedit)
         self.pushButton.setFont(font)
         self.pushButton.setStyleSheet("background-color: rgb(128, 172, 196);\n"
 "color: rgb(42, 93, 120);\n"
