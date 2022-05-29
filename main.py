@@ -1,56 +1,101 @@
-import sys, re, urllib, html2text
-from urllib import request
-from PyQt5 import QtCore, QtGui, QtWidgets
+import sys
+import json
 from PyQt5.QtGui import QTextCursor,QImage
-import requests
+from PyQt5.QtWidgets import QDesktopWidget
 from Check_db import *
 from LoginP import *
-from ParseFormP import *
+from ParseFormPN import *
+from RequestsHandler import *
 
 class InterfaceR(QtWidgets.QWidget):
+
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
     def __init__(self, parent=None):
-        super(InterfaceR,self).__init__(parent)
+        super(InterfaceR, self).__init__(parent)
         self.ui = Ui_Form()
         self.ui.setupUi(self)
-        self.newsURL=[]
-        self.parser()
-
+        self.parser('world')
+        self.getCategories()
 
         self.ui.pushButton.clicked.connect(self.OpenNews)
+        self.ui.listWidget_Categories.currentRowChanged.connect(self.updateParse)
 
-    def parser(self):
-        s = 'https://russian.rt.com/news'
-        doc = urllib.request.urlopen(s).read().decode('utf-8', errors='ignore')
-        doc = doc.replace('\n', '')
-        zagolovki = re.findall('<a class="link link_color" href="(.+?)</a>', doc)
-        for x in zagolovki:
-            self.newsURL.append(x.split('">')[0])
-            self.ui.listWidget.addItem(x.split('">')[1].strip() + "\n")
+    def updateParse(self):
+        self.ui.listWidget.clear()
+        jsonConnect = open("data/categories.json")
+        data = json.load(jsonConnect)
+        n = self.ui.listWidget_Categories.currentRow()
+        curCategory = data[f"{n}"]['category_Link']
+        self.parser(curCategory)
+
+
+    def getCategories(self):
+        url = "https://ria.ru"
+        soup = GetSoup(self, url)
+        i = 0
+        categories_card = soup.find_all("a", {"class": "cell-extension__item-link"}, limit=6)
+        category_info = {}
+        for category in categories_card:
+            category_Name = category.find("span", class_="cell-extension__item-title").text.strip()
+            category_Link = category.get("href")
+            category_info[i] = {
+                    'category_Name': category_Name,
+                    'category_Link':category_Link
+            }
+            i += 1
+            self.ui.listWidget_Categories.addItem(category_Name)
+            with open(f"data/categories.json", "w") as file:
+                json.dump(category_info, file, indent=4, ensure_ascii=False)
+
+    def parser(self,category):
+        url = "https://ria.ru/" + category
+
+        i = 0
+        news_cards = GetSoup(self, url).findAll("div", {"class": "list-item"})
+        card_info = {}
+        for card in news_cards:
+            card_Header = card.find("a", class_="list-item__title").text.strip()
+            card_Url = card.find("a", class_="list-item__title").get("href")
+            card_Date = card.find("div", class_="list-item__date").text.strip()
+            card_info[i] = {
+                 "cards": {
+                                'card_Header':card_Header,
+                                'card_Date': card_Date,
+                                'card_Url':card_Url
+                 }
+            }
+            i+=1
+            self.ui.listWidget.addItem(card_Header)
+            with open("data/news.json", "w") as file:
+                json.dump(card_info, file, indent=4, ensure_ascii=False)
 
 
     def OpenNews(self):
-        n= self.ui.listWidget.currentRow()
-        u = 'https://russian.rt.com'+self.newsURL[n]
-        doc = urllib.request.urlopen(u).read().decode('utf-8', errors='ignore')
-        h = html2text.HTML2Text()
-        h.ignore_links= True
-        h.body_width= False
-        h.ignore_images= True
-        doc = h.handle(doc)
-        mas = doc.split('\n')
-        newstext = ''
-        imgsrc = "https://cdni.rt.com/russian/images/2022.05/article/6291c0f5ae5ac933e1109912.jpg"
+        n = self.ui.listWidget.currentRow()
+        jsonConnect = open("data/news.json")
+        data = json.load(jsonConnect)
+        sub_Url = data[f"{n}"]['cards']['card_Url']
+        soup = GetSoup(self, sub_Url)
+        imgSrc = soup.find("div", class_="photoview__open").img.get("src")
+        dateInfo = soup.find("div", class_="article__info-date").a.get_text()
+        at_Layout = soup.find_all("div", class_="article__text")
+        finalLayout = ''
+        for at in at_Layout:
+            finalLayout +=(f"{at.get_text()}\n")
+
         image = QImage()
-        image.loadFromData(requests.get(imgsrc).content)
+        image.loadFromData(requests.get(imgSrc).content)
         image = image.scaledToWidth(myR.width() - 100)
         document = self.ui.textEdit.document()
         cursor = QTextCursor(document)
-
-        for x in mas:
-            if(len(x)>90):
-                newstext = newstext+x+'\n\n'
-                self.ui.textEdit.setText(newstext)
-                cursor.insertImage(image)
+        cursor.insertImage(image)
+        cursor.insertText("\n\n" + finalLayout)
+        cursor.insertText(dateInfo)
 
 
 
@@ -68,15 +113,6 @@ class Interface(QtWidgets.QMainWindow):
         self.check_db = CheckTheread()
         self.check_db.mysignal.connect(self.signal_handler)
 
-
-    #def eventFilter(self, obj, e):
-        #if e.type() == 2:
-            #btn = e.button()
-            #if btn == 1:
-                #self.label_2.setText('Clicked Left Button')
-            #elif btn == 2:
-                #self.label_2.setText('Clicked Right Button')
-        #return super(Ui_MainWindow, self).eventFilter(obj, e)
 
     def check_input(funct):
         def wrapper(self):
@@ -109,16 +145,15 @@ class Interface(QtWidgets.QMainWindow):
 
 
 
-
-
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     mywin = Interface()
-    mywin.setWindowTitle('NewsSkrap')
-    mywin.setFixedSize(600,700)
+    mywin.setWindowTitle('NewsScrap')
+    mywin.setFixedSize(600, 700)
     myR = InterfaceR()
-    myR.setWindowTitle('NewsSkrap')
-    myR.setFixedSize(800,900)
-    myR.ui.textEdit.toHtml()
+    myR.setWindowTitle('NewsScrap')
+    myR.setFixedSize(1000, 950)
+    myR.center()
     mywin.show()
+    #myR.show()
     sys.exit(app.exec_())
