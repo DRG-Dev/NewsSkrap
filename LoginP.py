@@ -43,6 +43,7 @@ class Ui_MainWindow(object):
         self.lineEdit.setObjectName("lineEdit")
         self.lineEdit_2 = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit_2.setGeometry(QtCore.QRect(190, 310, 225, 44))
+        self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
         font = QtGui.QFont()
         font.setPointSize(16)
         self.lineEdit_2.setFont(font)

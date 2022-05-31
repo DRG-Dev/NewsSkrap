@@ -23,7 +23,12 @@ class InterfaceR(QtWidgets.QWidget):
         self.parser('world')
         self.getCategories()
 
-        self.ui.pushButton.clicked.connect(self.OpenNews)
+        self.ui.listWidget_Categories.setCurrentRow(1)
+        self.ui.listWidget.setCurrentRow(0)
+        self.OpenNews()
+
+        # Events
+        self.ui.listWidget.clicked.connect(self.OpenNews)
         self.ui.listWidget_Categories.currentRowChanged.connect(self.updateParse)
 
     def updateParse(self):
@@ -53,7 +58,7 @@ class InterfaceR(QtWidgets.QWidget):
             with open(f"data/categories.json", "w") as file:
                 json.dump(category_info, file, indent=4, ensure_ascii=False)
 
-    def parser(self,category):
+    def parser(self, category):
         url = "https://ria.ru/" + category
 
         i = 0
@@ -92,7 +97,7 @@ class InterfaceR(QtWidgets.QWidget):
 
         image = QImage()
         image.loadFromData(requests.get(imgSrc).content)
-        image = image.scaledToWidth(myR.width() - 60)
+        image = image.scaledToWidth(940)
 
         document = self.ui.textEdit.document()
         cursor = QTextCursor(document)
@@ -158,7 +163,7 @@ if __name__ == "__main__":
     myR = InterfaceR()
     myR.setWindowTitle('NewsScrap')
     myR.setWindowIcon(QtGui.QIcon('1.png'))
-    myR.setFixedSize(1000, 950)
+    myR.setFixedSize(1000, 900)
     myR.center()
     mywin.show()
     #myR.show()
